@@ -33,8 +33,8 @@ const features = [
 
 export default function Features() {
   return (
-    <section id="features" className="py-[100px]">
-      <div className="features-header reveal flex justify-between items-end mb-16 gap-10">
+    <section id="features">
+      <div className="features-header reveal">
         <div>
           <div className="section-label">核心功能</div>
           <h2 className="section-title">
@@ -47,29 +47,13 @@ export default function Features() {
           每个功能都围绕一个目标：帮你从不懂到懂，从懂到通。没有捷径，只有扎实的路。
         </p>
       </div>
-      <div className="features-grid reveal grid grid-cols-3 gap-px">
+      <div className="features-grid reveal">
         {features.map((feature, i) => (
-          <div
-            key={i}
-            className="feature-card bg-bg-surface p-12 px-9 relative overflow-hidden transition-all duration-500 cursor-default hover:-translate-y-1 group"
-          >
-            <div
-              className="absolute top-0 left-0 w-full h-full opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-              style={{
-                background:
-                  'linear-gradient(135deg, rgba(212, 168, 83, 0.06), transparent 60%)',
-              }}
-            />
-            <div className="feature-num font-display text-[4rem] font-black text-bg-elevated leading-none mb-6 transition-colors duration-500 group-hover:text-[rgba(212,168,83,0.15)]">
-              {feature.num}
-            </div>
-            <div className="feature-line w-8 h-0.5 bg-gold-primary mb-5 transition-all duration-300 group-hover:w-16" />
-            <h3 className="font-display text-[1.35rem] font-bold mb-3.5 text-text-primary">
-              {feature.title}
-            </h3>
-            <p className="text-text-secondary leading-[1.7] text-[0.92rem]">
-              {feature.desc}
-            </p>
+          <div key={i} className="feature-card">
+            <div className="feature-num">{feature.num}</div>
+            <div className="feature-line" />
+            <h3>{feature.title}</h3>
+            <p>{feature.desc}</p>
           </div>
         ))}
       </div>

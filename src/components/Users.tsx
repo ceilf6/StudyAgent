@@ -7,7 +7,7 @@ const users = [
 
 export default function Users() {
   return (
-    <section id="users" className="py-[100px]">
+    <section id="users">
       <div className="reveal">
         <div className="section-label">目标用户</div>
         <h2 className="section-title">
@@ -16,20 +16,12 @@ export default function Users() {
           人都值得被认真对待
         </h2>
       </div>
-      <div className="users-grid reveal grid grid-cols-4 gap-6 mt-14">
+      <div className="users-grid reveal">
         {users.map((user, i) => (
-          <div
-            key={i}
-            className="user-card bg-bg-surface border border-[rgba(212,168,83,0.12)] rounded-[20px] p-9 px-7 text-center transition-all duration-400 relative overflow-hidden hover:-translate-y-1.5 group"
-          >
-            <span className="absolute bottom-0 left-0 right-0 h-[3px] bg-gold-primary scale-x-0 transition-transform duration-400 group-hover:scale-x-100" />
-            <span className="user-emoji text-[2.4rem] mb-5 block">{user.emoji}</span>
-            <h4 className="font-display text-[1.1rem] font-bold mb-2.5 text-text-primary">
-              {user.title}
-            </h4>
-            <p className="text-text-secondary text-[0.85rem] leading-[1.6]">
-              {user.desc}
-            </p>
+          <div key={i} className="user-card">
+            <span className="user-emoji">{user.emoji}</span>
+            <h4>{user.title}</h4>
+            <p>{user.desc}</p>
           </div>
         ))}
       </div>

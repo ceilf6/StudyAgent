@@ -8,8 +8,8 @@ const steps = [
 
 export default function Workflow() {
   return (
-    <section id="workflow" className="workflow py-[100px] relative">
-      <div className="workflow-inner grid grid-cols-2 gap-20 items-center">
+    <section id="workflow">
+      <div className="workflow-inner">
         <div className="reveal">
           <div className="section-label">学习流程</div>
           <h2 className="section-title">
@@ -21,27 +21,13 @@ export default function Workflow() {
             不需要提前准备什么。你只需要带着学习目标，剩下的交给我们。
           </p>
         </div>
-        <div className="workflow-steps reveal flex flex-col">
+        <div className="workflow-steps reveal">
           {steps.map((step, i) => (
-            <div
-              key={i}
-              className="workflow-step grid grid-cols-[64px_1fr] gap-6 py-8 border-b border-[rgba(212,168,83,0.12)] relative transition-all hover:pl-3"
-              style={
-                i === 0
-                  ? { borderTop: '1px solid rgba(212,168,83,0.12)' }
-                  : {}
-              }
-            >
-              <div className="workflow-step-num font-display text-[1.6rem] font-bold text-gold-dim transition-colors">
-                {step.num}
-              </div>
+            <div key={i} className="workflow-step">
+              <div className="workflow-step-num">{step.num}</div>
               <div>
-                <h4 className="font-display text-[1.15rem] font-bold mb-1.5 text-text-primary">
-                  {step.title}
-                </h4>
-                <p className="text-text-secondary text-[0.9rem] leading-[1.6]">
-                  {step.desc}
-                </p>
+                <h4>{step.title}</h4>
+                <p>{step.desc}</p>
               </div>
             </div>
           ))}
