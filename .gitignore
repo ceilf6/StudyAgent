@@ -1,1 +1,15 @@
 trae-AI大赛/
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+tsconfig.tsbuildinfo
+
+# Editor
+.vscode/
+.idea/
+
+# OS
+.DS_Store
