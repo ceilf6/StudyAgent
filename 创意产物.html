@@ -3,509 +3,911 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KnowledgeFlow - AI智能体驱动的学习平台，让知识轻松流入你的脑海</title>
+    <title>KnowledgeFlow — 让知识流入你的脑海</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg-deep: #0a0a0f;
+            --bg-surface: #12121a;
+            --bg-elevated: #1a1a26;
+            --gold-primary: #d4a853;
+            --gold-light: #e8c878;
+            --gold-dim: #8a6d2b;
+            --teal-accent: #2dd4bf;
+            --teal-deep: #0d9488;
+            --text-primary: #f0ece4;
+            --text-secondary: #9a958c;
+            --text-muted: #5c584f;
+            --border-subtle: rgba(212, 168, 83, 0.12);
+            --border-hover: rgba(212, 168, 83, 0.35);
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            font-family: 'DM Sans', 'Noto Serif SC', sans-serif;
+            background: var(--bg-deep);
             min-height: 100vh;
-            color: #f8fafc;
+            color: var(--text-primary);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Noise texture overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* Ambient glow orbs */
+        .ambient-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .ambient-orb.orb-1 {
+            width: 600px; height: 600px;
+            background: var(--gold-primary);
+            top: -200px; right: -150px;
+            animation: orbFloat1 20s ease-in-out infinite;
+        }
+        .ambient-orb.orb-2 {
+            width: 400px; height: 400px;
+            background: var(--teal-accent);
+            bottom: 10%; left: -100px;
+            animation: orbFloat2 25s ease-in-out infinite;
+        }
+        .ambient-orb.orb-3 {
+            width: 300px; height: 300px;
+            background: var(--gold-dim);
+            top: 50%; right: 20%;
+            animation: orbFloat3 18s ease-in-out infinite;
+        }
+
+        @keyframes orbFloat1 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(-80px, 60px) scale(1.1); }
+            66% { transform: translate(40px, -30px) scale(0.9); }
+        }
+        @keyframes orbFloat2 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(60px, -80px) scale(1.15); }
+        }
+        @keyframes orbFloat3 {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(-50px, 40px); }
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1280px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 0 40px;
+            position: relative;
+            z-index: 1;
         }
 
-        header {
-            text-align: center;
-            padding: 60px 20px 40px;
-        }
-
-        .logo {
-            display: inline-flex;
+        /* ─── NAV ─── */
+        nav {
+            display: flex;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 20px;
+            justify-content: space-between;
+            padding: 28px 0;
+            border-bottom: 1px solid var(--border-subtle);
         }
-
-        .logo-icon {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, #10B981, #06B6D4);
-            border-radius: 14px;
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            text-decoration: none;
+        }
+        .nav-logo-mark {
+            width: 42px; height: 42px;
+            border: 2px solid var(--gold-primary);
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
-            animation: float 3s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
-        h1 {
-            font-size: 3rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #10B981, #06B6D4);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 16px;
-        }
-
-        .subtitle {
-            font-size: 1.25rem;
-            color: #94a3b8;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 24px;
-            padding: 40px 0;
-        }
-
-        .feature-card {
-            background: rgba(30, 41, 59, 0.8);
-            border: 1px solid rgba(16, 185, 129, 0.2);
-            border-radius: 20px;
-            padding: 32px;
-            transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
         }
+        .nav-logo-mark::after {
+            content: '';
+            position: absolute;
+            width: 20px; height: 20px;
+            background: var(--gold-primary);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: logoPulse 3s ease-in-out infinite;
+        }
+        @keyframes logoPulse {
+            0%, 100% { transform: scale(0.6); opacity: 0.3; }
+            50% { transform: scale(1.2); opacity: 0.1; }
+        }
+        .nav-logo-text {
+            font-family: 'Playfair Display', 'Noto Serif SC', serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+        }
+        .nav-links {
+            display: flex;
+            gap: 36px;
+            list-style: none;
+        }
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.88rem;
+            font-weight: 500;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            transition: color 0.3s;
+            position: relative;
+        }
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px; left: 0;
+            width: 0; height: 1px;
+            background: var(--gold-primary);
+            transition: width 0.3s;
+        }
+        .nav-links a:hover { color: var(--gold-light); }
+        .nav-links a:hover::after { width: 100%; }
 
+        /* ─── HERO ─── */
+        .hero {
+            padding: 120px 0 100px;
+            position: relative;
+        }
+        .hero-eyebrow {
+            font-size: 0.78rem;
+            font-weight: 500;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--gold-primary);
+            margin-bottom: 28px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            opacity: 0;
+            animation: fadeSlideUp 0.8s 0.2s forwards;
+        }
+        .hero-eyebrow::before {
+            content: '';
+            width: 40px; height: 1px;
+            background: var(--gold-primary);
+        }
+        .hero h1 {
+            font-family: 'Playfair Display', 'Noto Serif SC', serif;
+            font-size: clamp(3rem, 7vw, 5.5rem);
+            font-weight: 900;
+            line-height: 1.05;
+            letter-spacing: -0.03em;
+            color: var(--text-primary);
+            margin-bottom: 32px;
+            max-width: 800px;
+            opacity: 0;
+            animation: fadeSlideUp 0.8s 0.4s forwards;
+        }
+        .hero h1 em {
+            font-style: italic;
+            color: var(--gold-primary);
+            position: relative;
+        }
+        .hero h1 em::after {
+            content: '';
+            position: absolute;
+            bottom: 4px; left: 0; right: 0;
+            height: 3px;
+            background: var(--gold-primary);
+            opacity: 0.4;
+        }
+        .hero-desc {
+            font-size: 1.15rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            max-width: 520px;
+            margin-bottom: 48px;
+            opacity: 0;
+            animation: fadeSlideUp 0.8s 0.6s forwards;
+        }
+        .hero-actions {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            opacity: 0;
+            animation: fadeSlideUp 0.8s 0.8s forwards;
+        }
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 36px;
+            background: var(--gold-primary);
+            color: var(--bg-deep);
+            text-decoration: none;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            letter-spacing: 0.02em;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            border: none;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, transparent 30%, rgba(255,255,255,0.2) 50%, transparent 70%);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+        .btn-primary:hover::before { transform: translateX(100%); }
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 16px 48px rgba(212, 168, 83, 0.35);
+        }
+        .btn-ghost {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 16px 28px;
+            background: transparent;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border: 1px solid var(--border-subtle);
+            border-radius: 60px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .btn-ghost:hover {
+            border-color: var(--border-hover);
+            color: var(--gold-light);
+        }
+
+        /* Hero decorative element */
+        .hero-visual {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 420px;
+            height: 420px;
+            opacity: 0;
+            animation: fadeIn 1.2s 1s forwards;
+        }
+        .hero-ring {
+            position: absolute;
+            border: 1px solid var(--border-subtle);
+            border-radius: 50%;
+            animation: ringRotate 30s linear infinite;
+        }
+        .hero-ring:nth-child(1) { inset: 0; }
+        .hero-ring:nth-child(2) { inset: 40px; animation-direction: reverse; animation-duration: 25s; border-color: rgba(45, 212, 191, 0.1); }
+        .hero-ring:nth-child(3) { inset: 80px; animation-duration: 20s; }
+        .hero-ring:nth-child(4) { inset: 120px; animation-direction: reverse; animation-duration: 35s; border-color: rgba(45, 212, 191, 0.08); }
+        .hero-ring-dot {
+            position: absolute;
+            width: 8px; height: 8px;
+            background: var(--gold-primary);
+            border-radius: 50%;
+            top: 50%; left: -4px;
+        }
+        @keyframes ringRotate { to { transform: rotate(360deg); } }
+        @keyframes fadeIn { to { opacity: 1; } }
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ─── STATS STRIP ─── */
+        .stats-strip {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            border-top: 1px solid var(--border-subtle);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 0;
+        }
+        .stat-item {
+            padding: 40px 32px;
+            text-align: center;
+            position: relative;
+        }
+        .stat-item:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            right: 0; top: 20%; height: 60%;
+            width: 1px;
+            background: var(--border-subtle);
+        }
+        .stat-value {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: var(--gold-primary);
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+        .stat-label {
+            font-size: 0.82rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        /* ─── SECTION COMMON ─── */
+        section { padding: 100px 0; }
+        .section-label {
+            font-size: 0.72rem;
+            font-weight: 500;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: var(--gold-dim);
+            margin-bottom: 16px;
+        }
+        .section-title {
+            font-family: 'Playfair Display', 'Noto Serif SC', serif;
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 700;
+            line-height: 1.15;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+        }
+        .section-desc {
+            font-size: 1.05rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            max-width: 500px;
+        }
+
+        /* ─── FEATURES ─── */
+        .features-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 64px;
+            gap: 40px;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2px;
+        }
+        .feature-card {
+            background: var(--bg-surface);
+            padding: 48px 36px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: default;
+        }
         .feature-card::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, #10B981, #06B6D4);
-            transform: scaleX(0);
-            transition: transform 0.3s ease;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: linear-gradient(135deg, rgba(212, 168, 83, 0.06), transparent 60%);
+            opacity: 0;
+            transition: opacity 0.5s;
         }
+        .feature-card:hover::before { opacity: 1; }
+        .feature-card:hover { transform: translateY(-4px); }
 
-        .feature-card:hover::before {
-            transform: scaleX(1);
+        .feature-num {
+            font-family: 'Playfair Display', serif;
+            font-size: 4rem;
+            font-weight: 900;
+            color: var(--bg-elevated);
+            line-height: 1;
+            margin-bottom: 24px;
+            transition: color 0.5s;
         }
-
-        .feature-card:hover {
-            transform: translateY(-8px);
-            border-color: rgba(16, 185, 129, 0.5);
-            box-shadow: 0 25px 50px -12px rgba(16, 185, 129, 0.25);
-        }
-
-        .feature-icon {
-            width: 56px;
-            height: 56px;
-            background: linear-gradient(135deg, #10B981, #06B6D4);
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            margin-bottom: 20px;
-        }
+        .feature-card:hover .feature-num { color: rgba(212, 168, 83, 0.15); }
 
         .feature-card h3 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 12px;
-            color: #f1f5f9;
+            font-family: 'Playfair Display', 'Noto Serif SC', serif;
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-bottom: 14px;
+            color: var(--text-primary);
         }
-
         .feature-card p {
-            color: #94a3b8;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            font-size: 0.92rem;
+        }
+        .feature-line {
+            width: 32px; height: 2px;
+            background: var(--gold-primary);
+            margin-bottom: 20px;
+            transition: width 0.4s;
+        }
+        .feature-card:hover .feature-line { width: 64px; }
+
+        /* ─── WORKFLOW ─── */
+        .workflow {
+            position: relative;
+        }
+        .workflow-inner {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+        }
+        .workflow-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+        .workflow-step {
+            display: grid;
+            grid-template-columns: 64px 1fr;
+            gap: 24px;
+            padding: 32px 0;
+            border-bottom: 1px solid var(--border-subtle);
+            position: relative;
+            transition: all 0.3s;
+        }
+        .workflow-step:first-child { border-top: 1px solid var(--border-subtle); }
+        .workflow-step:hover { padding-left: 12px; }
+        .workflow-step-num {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--gold-dim);
+            transition: color 0.3s;
+        }
+        .workflow-step:hover .workflow-step-num { color: var(--gold-primary); }
+        .workflow-step h4 {
+            font-family: 'Playfair Display', 'Noto Serif SC', serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: var(--text-primary);
+        }
+        .workflow-step p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
             line-height: 1.6;
         }
 
-        .stats {
+        /* ─── USERS ─── */
+        .users-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(4, 1fr);
             gap: 24px;
-            padding: 40px 0;
+            margin-top: 56px;
         }
-
-        .stat-card {
-            text-align: center;
-            padding: 32px;
-            background: rgba(30, 41, 59, 0.6);
-            border-radius: 16px;
-        }
-
-        .stat-number {
-            font-size: 3rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #10B981, #06B6D4);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 8px;
-        }
-
-        .stat-label {
-            color: #94a3b8;
-            font-size: 0.9rem;
-        }
-
-        .workflow {
-            padding: 40px 0;
-        }
-
-        .workflow h2 {
-            text-align: center;
-            font-size: 2rem;
-            margin-bottom: 40px;
-            color: #f1f5f9;
-        }
-
-        .workflow-steps {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 32px;
-        }
-
-        .step {
-            text-align: center;
-            max-width: 200px;
-        }
-
-        .step-number {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, #10B981, #06B6D4);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-            font-weight: 700;
-            margin: 0 auto 16px;
-        }
-
-        .step-title {
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #f1f5f9;
-        }
-
-        .step-desc {
-            color: #94a3b8;
-            font-size: 0.9rem;
-        }
-
-        .target-users {
-            padding: 40px 0;
-        }
-
-        .target-users h2 {
-            text-align: center;
-            font-size: 2rem;
-            margin-bottom: 40px;
-            color: #f1f5f9;
-        }
-
-        .user-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 24px;
-        }
-
         .user-card {
-            background: rgba(30, 41, 59, 0.8);
-            border-radius: 16px;
-            padding: 24px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            padding: 36px 28px;
             text-align: center;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .user-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 3px;
+            background: var(--gold-primary);
+            transform: scaleX(0);
+            transition: transform 0.4s;
+        }
+        .user-card:hover::after { transform: scaleX(1); }
+        .user-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--border-hover);
+        }
+        .user-emoji {
+            font-size: 2.4rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+        .user-card h4 {
+            font-family: 'Playfair Display', 'Noto Serif SC', serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+        .user-card p {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            line-height: 1.6;
         }
 
-        .user-icon {
-            width: 64px;
-            height: 64px;
-            background: linear-gradient(135deg, #F59E0B, #EF4444);
-            border-radius: 50%;
+        /* ─── TECH ─── */
+        .tech-section {
+            border-top: 1px solid var(--border-subtle);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 60px 0;
+        }
+        .tech-inner {
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            margin: 0 auto 16px;
+            gap: 48px;
         }
-
-        .user-card:nth-child(2) .user-icon {
-            background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+        .tech-label {
+            font-size: 0.72rem;
+            font-weight: 500;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            white-space: nowrap;
         }
-
-        .user-card:nth-child(3) .user-icon {
-            background: linear-gradient(135deg, #06B6D4, #10B981);
-        }
-
-        .user-card:nth-child(4) .user-icon {
-            background: linear-gradient(135deg, #EC4899, #F59E0B);
-        }
-
-        .user-card h4 {
-            margin-bottom: 8px;
-            color: #f1f5f9;
-        }
-
-        .user-card p {
-            color: #94a3b8;
-            font-size: 0.9rem;
-        }
-
-        footer {
-            text-align: center;
-            padding: 40px 20px;
-            border-top: 1px solid rgba(148, 163, 184, 0.1);
-            margin-top: 40px;
-        }
-
-        footer p {
-            color: #64748b;
-            font-size: 0.9rem;
-        }
-
-        .cta {
-            text-align: center;
-            padding: 60px 20px;
-        }
-
-        .cta h2 {
-            font-size: 2.5rem;
-            margin-bottom: 16px;
-            color: #f1f5f9;
-        }
-
-        .cta p {
-            color: #94a3b8;
-            font-size: 1.1rem;
-            margin-bottom: 32px;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 14px 32px;
-            background: linear-gradient(135deg, #10B981, #06B6D4);
-            color: white;
-            text-decoration: none;
-            border-radius: 12px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            border: none;
-            cursor: pointer;
-            font-size: 1rem;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 40px rgba(16, 185, 129, 0.4);
-        }
-
-        .tech-stack {
-            padding: 40px 0;
-        }
-
-        .tech-stack h2 {
-            text-align: center;
-            font-size: 2rem;
-            margin-bottom: 40px;
-            color: #f1f5f9;
-        }
-
         .tech-tags {
             display: flex;
             flex-wrap: wrap;
-            justify-content: center;
-            gap: 12px;
+            gap: 10px;
         }
-
         .tech-tag {
             padding: 8px 20px;
-            background: rgba(16, 185, 129, 0.1);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            border-radius: 20px;
-            color: #10B981;
-            font-size: 0.9rem;
+            border: 1px solid var(--border-subtle);
+            border-radius: 40px;
+            color: var(--text-secondary);
+            font-size: 0.82rem;
+            font-weight: 500;
+            letter-spacing: 0.03em;
+            transition: all 0.3s;
+        }
+        .tech-tag:hover {
+            border-color: var(--gold-primary);
+            color: var(--gold-light);
+            background: rgba(212, 168, 83, 0.06);
         }
 
+        /* ─── CTA ─── */
+        .cta-section {
+            text-align: center;
+            padding: 140px 0;
+            position: relative;
+        }
+        .cta-section .section-title {
+            max-width: 600px;
+            margin: 0 auto 20px;
+        }
+        .cta-section .section-desc {
+            max-width: 480px;
+            margin: 0 auto 48px;
+        }
+
+        /* ─── FOOTER ─── */
+        footer {
+            border-top: 1px solid var(--border-subtle);
+            padding: 40px 0;
+        }
+        .footer-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .footer-text {
+            color: var(--text-muted);
+            font-size: 0.82rem;
+        }
+        .footer-links {
+            display: flex;
+            gap: 24px;
+            list-style: none;
+        }
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.82rem;
+            transition: color 0.3s;
+        }
+        .footer-links a:hover { color: var(--gold-light); }
+
+        /* ─── RESPONSIVE ─── */
+        @media (max-width: 1024px) {
+            .hero-visual { display: none; }
+            .features-grid { grid-template-columns: repeat(2, 1fr); }
+            .users-grid { grid-template-columns: repeat(2, 1fr); }
+            .workflow-inner { grid-template-columns: 1fr; gap: 40px; }
+        }
         @media (max-width: 768px) {
-            h1 {
-                font-size: 2rem;
-            }
+            .container { padding: 0 24px; }
+            nav { flex-direction: column; gap: 16px; }
+            .nav-links { gap: 20px; }
+            .hero { padding: 80px 0 60px; }
+            .features-grid { grid-template-columns: 1fr; }
+            .stats-strip { grid-template-columns: repeat(2, 1fr); }
+            .stat-item:nth-child(2)::after { display: none; }
+            .users-grid { grid-template-columns: 1fr; }
+            .features-header { flex-direction: column; align-items: flex-start; }
+            .tech-inner { flex-direction: column; align-items: flex-start; gap: 20px; }
+            .footer-inner { flex-direction: column; gap: 16px; }
+            .hero-actions { flex-direction: column; align-items: flex-start; }
+        }
 
-            .subtitle {
-                font-size: 1rem;
-            }
-
-            .feature-card {
-                padding: 24px;
-            }
-
-            .stat-number {
-                font-size: 2rem;
-            }
+        /* ─── SCROLL REVEAL ─── */
+        .reveal {
+            opacity: 0;
+            transform: translateY(32px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="logo">
-                <div class="logo-icon">📚</div>
-            </div>
-            <h1>KnowledgeFlow</h1>
-            <p class="subtitle">AI智能体驱动的学习平台，让知识轻松流入你的脑海</p>
-        </header>
 
-        <section class="stats">
-            <div class="stat-card">
-                <div class="stat-number">10K+</div>
+    <div class="ambient-orb orb-1"></div>
+    <div class="ambient-orb orb-2"></div>
+    <div class="ambient-orb orb-3"></div>
+
+    <div class="container">
+        <nav>
+            <a class="nav-logo" href="#">
+                <div class="nav-logo-mark"></div>
+                <span class="nav-logo-text">KnowledgeFlow</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="#features">功能</a></li>
+                <li><a href="#workflow">流程</a></li>
+                <li><a href="#users">用户</a></li>
+                <li><a href="#start">开始</a></li>
+            </ul>
+        </nav>
+
+        <!-- HERO -->
+        <section class="hero">
+            <div class="hero-eyebrow">AI 驱动的学习平台</div>
+            <h1>让知识<br><em>轻松流入</em><br>你的脑海</h1>
+            <p class="hero-desc">通过智能提示词工程与知识图谱技术，从零开始逐点突破。不跳步、不假设，每一步都为你而走。</p>
+            <div class="hero-actions">
+                <button class="btn-primary">开始学习 <span>→</span></button>
+                <a class="btn-ghost" href="#features">了解更多</a>
+            </div>
+            <div class="hero-visual">
+                <div class="hero-ring"><div class="hero-ring-dot"></div></div>
+                <div class="hero-ring"><div class="hero-ring-dot"></div></div>
+                <div class="hero-ring"></div>
+                <div class="hero-ring"></div>
+            </div>
+        </section>
+
+        <!-- STATS -->
+        <div class="stats-strip reveal">
+            <div class="stat-item">
+                <div class="stat-value">10K+</div>
                 <div class="stat-label">活跃学习者</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-number">100+</div>
+            <div class="stat-item">
+                <div class="stat-value">100+</div>
                 <div class="stat-label">学习领域</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-number">98%</div>
+            <div class="stat-item">
+                <div class="stat-value">98%</div>
                 <div class="stat-label">用户满意度</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-number">24/7</div>
-                <div class="stat-label">AI学习助手</div>
+            <div class="stat-item">
+                <div class="stat-value">24/7</div>
+                <div class="stat-label">AI 学习助手</div>
             </div>
-        </section>
+        </div>
 
-        <section class="features">
-            <div class="feature-card">
-                <div class="feature-icon">🎯</div>
-                <h3>智能学习计划</h3>
-                <p>根据你的学习目标和当前水平，智能生成个性化学习路径，追踪学习进度，让每一步都有方向。</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">💡</div>
-                <h3>AI知识点讲解</h3>
-                <p>从零开始，循序渐进。AI会先补充前置概念，再深入讲解，确保你真正理解每一个知识点。</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">📝</div>
-                <h3>智能练习测试</h3>
-                <p>题目练习、即时反馈、错题分析。AI会根据你的薄弱点推荐针对性练习，帮助你巩固所学。</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">📁</div>
-                <h3>资料可读化转换</h3>
-                <p>支持PDF、图片、视频等多种格式，自动OCR识别和翻译，让学习资料更易获取。</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">📊</div>
-                <h3>学习统计分析</h3>
-                <p>学习时长、知识点掌握度、成就徽章，全面了解你的学习情况，激发学习动力。</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">🔗</div>
-                <h3>知识图谱关联</h3>
-                <p>可视化展示知识点之间的联系，智能推荐学习顺序，构建完整知识体系。</p>
-            </div>
-        </section>
-
-        <section class="workflow">
-            <h2>学习流程</h2>
-            <div class="workflow-steps">
-                <div class="step">
-                    <div class="step-number">1</div>
-                    <div class="step-title">设定目标</div>
-                    <div class="step-desc">选择学习领域，设定学习目标</div>
+        <!-- FEATURES -->
+        <section id="features">
+            <div class="features-header reveal">
+                <div>
+                    <div class="section-label">核心功能</div>
+                    <h2 class="section-title">为真正的理解<br>而设计</h2>
                 </div>
-                <div class="step">
-                    <div class="step-number">2</div>
-                    <div class="step-title">规划路径</div>
-                    <div class="step-desc">AI生成个性化学习路线</div>
+                <p class="section-desc">每个功能都围绕一个目标：帮你从不懂到懂，从懂到通。没有捷径，只有扎实的路。</p>
+            </div>
+            <div class="features-grid reveal">
+                <div class="feature-card">
+                    <div class="feature-num">01</div>
+                    <div class="feature-line"></div>
+                    <h3>智能学习计划</h3>
+                    <p>根据学习目标与当前水平，生成个性化知识路线。追踪每一步进度，让方向清晰可见。</p>
                 </div>
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <div class="step-title">开始学习</div>
-                    <div class="step-desc">AI讲解知识点，循序渐进</div>
+                <div class="feature-card">
+                    <div class="feature-num">02</div>
+                    <div class="feature-line"></div>
+                    <h3>AI 知识点讲解</h3>
+                    <p>默认你是零基础。先补前置概念，再推进核心内容。每次只讲一个最小知识点，确保真正理解。</p>
                 </div>
-                <div class="step">
-                    <div class="step-number">4</div>
-                    <div class="step-title">练习巩固</div>
-                    <div class="step-desc">完成练习，强化记忆</div>
+                <div class="feature-card">
+                    <div class="feature-num">03</div>
+                    <div class="feature-line"></div>
+                    <h3>智能练习测试</h3>
+                    <p>即时反馈、错题分析、针对性推荐。AI 根据你的薄弱点定制练习，精准巩固。</p>
                 </div>
-                <div class="step">
-                    <div class="step-number">5</div>
-                    <div class="step-title">追踪进度</div>
-                    <div class="step-desc">查看统计，持续改进</div>
+                <div class="feature-card">
+                    <div class="feature-num">04</div>
+                    <div class="feature-line"></div>
+                    <h3>资料可读化</h3>
+                    <p>PDF、图片、视频、扫描件——自动 OCR 识别与翻译，将复杂资料转为可学习的格式。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-num">05</div>
+                    <div class="feature-line"></div>
+                    <h3>学习统计分析</h3>
+                    <p>知识点掌握度、学习时长、成就徽章。全面了解你的学习状态，激发持续动力。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-num">06</div>
+                    <div class="feature-line"></div>
+                    <h3>知识图谱关联</h3>
+                    <p>可视化知识点之间的联系，智能推荐学习顺序，帮你构建完整的知识体系。</p>
                 </div>
             </div>
         </section>
 
-        <section class="target-users">
-            <h2>目标用户</h2>
-            <div class="user-grid">
+        <!-- WORKFLOW -->
+        <section id="workflow" class="workflow">
+            <div class="workflow-inner">
+                <div class="reveal">
+                    <div class="section-label">学习流程</div>
+                    <h2 class="section-title">五步，从迷茫<br>到掌握</h2>
+                    <p class="section-desc">不需要提前准备什么。你只需要带着学习目标，剩下的交给我们。</p>
+                </div>
+                <div class="workflow-steps reveal">
+                    <div class="workflow-step">
+                        <div class="workflow-step-num">01</div>
+                        <div>
+                            <h4>设定目标</h4>
+                            <p>选择学习领域，明确你想掌握什么</p>
+                        </div>
+                    </div>
+                    <div class="workflow-step">
+                        <div class="workflow-step-num">02</div>
+                        <div>
+                            <h4>规划路径</h4>
+                            <p>AI 分析目标，生成个性化知识路线</p>
+                        </div>
+                    </div>
+                    <div class="workflow-step">
+                        <div class="workflow-step-num">03</div>
+                        <div>
+                            <h4>逐步学习</h4>
+                            <p>从零开始，每次一个知识点，循序渐进</p>
+                        </div>
+                    </div>
+                    <div class="workflow-step">
+                        <div class="workflow-step-num">04</div>
+                        <div>
+                            <h4>练习巩固</h4>
+                            <p>针对性练习，即时反馈，错题深度分析</p>
+                        </div>
+                    </div>
+                    <div class="workflow-step">
+                        <div class="workflow-step-num">05</div>
+                        <div>
+                            <h4>追踪进化</h4>
+                            <p>可视化进度，持续优化学习策略</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- USERS -->
+        <section id="users">
+            <div class="reveal">
+                <div class="section-label">目标用户</div>
+                <h2 class="section-title">每个认真学习的<br>人都值得被认真对待</h2>
+            </div>
+            <div class="users-grid reveal">
                 <div class="user-card">
-                    <div class="user-icon">👨‍🎓</div>
+                    <span class="user-emoji">👨‍🎓</span>
                     <h4>学生群体</h4>
-                    <p>从小学到大学，应对各种考试和学业挑战</p>
+                    <p>从小学到大学，应对考试与学业挑战，建立扎实的知识基础</p>
                 </div>
                 <div class="user-card">
-                    <div class="user-icon">👔</div>
+                    <span class="user-emoji">💼</span>
                     <h4>职场人士</h4>
-                    <p>学习新技能，提升职业竞争力</p>
+                    <p>利用碎片时间学习新技能，提升职业竞争力</p>
                 </div>
                 <div class="user-card">
-                    <div class="user-icon">📖</div>
+                    <span class="user-emoji">📖</span>
                     <h4>终身学习者</h4>
-                    <p>对知识有持续追求的探索者</p>
+                    <p>对知识有持续追求，享受学习本身的乐趣</p>
                 </div>
                 <div class="user-card">
-                    <div class="user-icon">👩‍🏫</div>
+                    <span class="user-emoji">👩‍🏫</span>
                     <h4>教育工作者</h4>
-                    <p>辅助教学，提升教学效果</p>
+                    <p>AI 辅助教学，提升教学效果，释放更多创造力</p>
                 </div>
             </div>
         </section>
 
-        <section class="tech-stack">
-            <h2>技术栈</h2>
-            <div class="tech-tags">
-                <span class="tech-tag">React</span>
-                <span class="tech-tag">TypeScript</span>
-                <span class="tech-tag">TailwindCSS</span>
-                <span class="tech-tag">Node.js</span>
-                <span class="tech-tag">Express</span>
-                <span class="tech-tag">PostgreSQL</span>
-                <span class="tech-tag">OpenAI API</span>
-                <span class="tech-tag">Supabase</span>
+        <!-- TECH -->
+        <div class="tech-section reveal">
+            <div class="tech-inner">
+                <span class="tech-label">技术栈</span>
+                <div class="tech-tags">
+                    <span class="tech-tag">React</span>
+                    <span class="tech-tag">TypeScript</span>
+                    <span class="tech-tag">TailwindCSS</span>
+                    <span class="tech-tag">Node.js</span>
+                    <span class="tech-tag">Express</span>
+                    <span class="tech-tag">PostgreSQL</span>
+                    <span class="tech-tag">OpenAI API</span>
+                    <span class="tech-tag">Supabase</span>
+                </div>
             </div>
-        </section>
+        </div>
 
-        <section class="cta">
-            <h2>开启你的学习之旅</h2>
-            <p>加入 KnowledgeFlow，让AI成为你的专属学习助手，开启高效学习新体验</p>
-            <button class="btn">立即开始学习</button>
+        <!-- CTA -->
+        <section id="start" class="cta-section reveal">
+            <div class="section-label">准备好了吗</div>
+            <h2 class="section-title">开启你的<br>学习之旅</h2>
+            <p class="section-desc">让 AI 成为你的专属学习助手，从第一个知识点开始，一步步构建属于你的知识体系。</p>
+            <button class="btn-primary">立即开始 <span>→</span></button>
         </section>
 
         <footer>
-            <p>KnowledgeFlow - 让知识轻松流入你的脑海</p>
+            <div class="footer-inner">
+                <span class="footer-text">KnowledgeFlow — 让知识轻松流入你的脑海</span>
+                <ul class="footer-links">
+                    <li><a href="#">关于我们</a></li>
+                    <li><a href="#">使用条款</a></li>
+                    <li><a href="#">联系方式</a></li>
+                </ul>
+            </div>
         </footer>
     </div>
+
+    <script>
+        // Scroll reveal
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.15 });
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // Smooth parallax for ambient orbs
+        let ticking = false;
+        window.addEventListener('scroll', () => {
+            if (!ticking) {
+                requestAnimationFrame(() => {
+                    const scrollY = window.scrollY;
+                    const orbs = document.querySelectorAll('.ambient-orb');
+                    orbs[0].style.transform = `translateY(${scrollY * 0.08}px)`;
+                    orbs[1].style.transform = `translateY(${scrollY * -0.05}px)`;
+                    orbs[2].style.transform = `translateY(${scrollY * 0.03}px)`;
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        });
+    </script>
 </body>
 </html>
