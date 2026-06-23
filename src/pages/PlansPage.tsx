@@ -92,7 +92,12 @@ export default function PlansPage() {
         abortRef.current.signal,
       )
     } catch (err) {
-      setError(err instanceof Error ? err.message : '生成失败，请检查设置')
+      if (err instanceof Error && err.name === 'AbortError') {
+        // 用户主动取消，保留已生成内容
+        if (plan) setPlan(plan)
+      } else {
+        setError(err instanceof Error ? err.message : '生成失败，请检查设置')
+      }
     } finally {
       setLoading(false)
       abortRef.current = null

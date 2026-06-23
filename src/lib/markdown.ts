@@ -78,7 +78,9 @@ export function markdownToHtml(md: string): string {
         flushList()
         flushTable()
         inCodeBlock = true
-        codeLang = line.trim().slice(3)
+        // 对 fence 语言做白名单过滤，只保留 [a-z0-9-]，防止属性注入
+        const rawLang = line.trim().slice(3).trim()
+        codeLang = rawLang.replace(/[^a-z0-9-]/gi, '').slice(0, 20)
       }
       continue
     }

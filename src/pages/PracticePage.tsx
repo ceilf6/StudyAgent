@@ -85,7 +85,11 @@ export default function PracticePage() {
         abortRef.current.signal,
       )
     } catch (err) {
-      setError(err instanceof Error ? err.message : '生成失败')
+      if (err instanceof Error && err.name === 'AbortError') {
+        // 用户主动取消，保留已生成内容
+      } else {
+        setError(err instanceof Error ? err.message : '生成失败')
+      }
     } finally {
       setLoading(false)
     }
@@ -166,7 +170,11 @@ function sum(n) {
       )
       addPractice({ topic, total: 3, correct: 2 })
     } catch (err) {
-      setError(err instanceof Error ? err.message : '批改失败')
+      if (err instanceof Error && err.name === 'AbortError') {
+        // 用户主动取消批改，保留已生成内容
+      } else {
+        setError(err instanceof Error ? err.message : '批改失败')
+      }
     } finally {
       setChecking(false)
     }
