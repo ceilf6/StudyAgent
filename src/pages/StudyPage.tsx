@@ -10,7 +10,7 @@ import { STUDY_SYSTEM_PROMPT } from '../lib/prompts'
 const SUGGESTED_TOPICS = ['递归', 'HTTP 协议', '光合作用', '闭包', '二分查找', '牛顿第一定律']
 
 export default function StudyPage() {
-  const { provider, apiKey, baseURL, model } = useSettingsStore()
+  const { provider, apiKey, baseURL, model, isConfigured } = useSettingsStore()
   const { sessions, createSession, addMessage, markLearned } = useStudyStore()
 
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null)
@@ -70,8 +70,8 @@ export default function StudyPage() {
       abortRef.current = myController
       const signal = myController.signal
 
-      // 演示模式
-      if (provider === 'demo') {
+      // 演示模式或配置不完整时走 demo 兜底，避免直接调真实 API 失败
+      if (provider === 'demo' || !isConfigured()) {
         const demoResp = getDemoResponse(text)
         if (!demoResp) {
           setStreaming(false)
@@ -137,7 +137,7 @@ export default function StudyPage() {
         setStreaming(false)
       }
     },
-    [currentSessionId, streaming, provider, apiKey, baseURL, model, createSession, addMessage, markLearned, streamContent],
+    [currentSessionId, streaming, provider, apiKey, baseURL, model, isConfigured, createSession, addMessage, markLearned, streamContent],
   )
 
   const handleSend = () => {

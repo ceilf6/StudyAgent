@@ -47,7 +47,7 @@ const DEMO_PLAN = `## 学习目标
 3. 理解"闭包是函数+词法环境"这个定义，而不是死记"函数嵌套"。`
 
 export default function PlansPage() {
-  const { provider, apiKey, baseURL, model } = useSettingsStore()
+  const { provider, apiKey, baseURL, model, isConfigured } = useSettingsStore()
   const { learned, markLearned } = useStudyStore()
 
   const [goal, setGoal] = useState('')
@@ -66,8 +66,8 @@ export default function PlansPage() {
     abortRef.current = myController
     const signal = myController.signal
 
-    // 演示模式
-    if (provider === 'demo') {
+    // 演示模式或配置不完整时走 demo 兜底
+    if (provider === 'demo' || !isConfigured()) {
       try {
         let acc = ''
         for (let i = 0; i < DEMO_PLAN.length; i += 5) {

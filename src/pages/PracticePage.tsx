@@ -67,7 +67,7 @@ function parseScore(text: string, total: number): number {
 }
 
 export default function PracticePage() {
-  const { provider, apiKey, baseURL, model } = useSettingsStore()
+  const { provider, apiKey, baseURL, model, isConfigured } = useSettingsStore()
   const { addPractice, practices } = useStudyStore()
 
   const [topic, setTopic] = useState('')
@@ -91,7 +91,7 @@ export default function PracticePage() {
     abortRef.current = myController
     const signal = myController.signal
 
-    if (provider === 'demo') {
+    if (provider === 'demo' || !isConfigured()) {
       try {
         let acc = ''
         for (let i = 0; i < DEMO_QUESTIONS.length; i += 5) {
@@ -143,7 +143,7 @@ export default function PracticePage() {
     abortRef.current = myController
     const signal = myController.signal
 
-    if (provider === 'demo') {
+    if (provider === 'demo' || !isConfigured()) {
       setChecking(true)
       const demoFeedback = `## 答案解析
 

@@ -1,20 +1,9 @@
 import { useState, useRef } from 'react'
 import AppLayout from '../components/AppLayout'
-import { useStudyStore } from '../store/studyStore'
-
-interface ResourceItem {
-  id: string
-  name: string
-  type: string
-  size: number
-  content?: string
-  status: 'uploaded' | 'processing' | 'readable'
-  createdAt: number
-}
+import { useStudyStore, type ResourceItem } from '../store/studyStore'
 
 export default function ResourcesPage() {
-  const { addStudyTime } = useStudyStore()
-  const [resources, setResources] = useState<ResourceItem[]>([])
+  const { addStudyTime, resources, addResource, updateResource, deleteResource } = useStudyStore()
   const [dragging, setDragging] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -27,45 +16,40 @@ export default function ResourcesPage() {
   const handleFiles = async (files: FileList | null) => {
     if (!files) return
     for (const file of Array.from(files)) {
-      const id = `r_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
-      const item: ResourceItem = {
-        id,
-        name: file.name,
-        type: file.type || 'unknown',
-        size: file.size,
-        status: 'uploaded',
-        createdAt: Date.now(),
-      }
-
       // 文本类文件读取内容
       if (file.type.startsWith('text/') || file.name.match(/\.(txt|md|json|csv|js|ts|py|html|css)$/i)) {
         try {
-          item.content = await file.text()
-          item.status = 'readable'
+          const content = await file.text()
+          addResource({
+            name: file.name,
+            type: file.type || 'unknown',
+            size: file.size,
+            content,
+            status: 'readable',
+          })
         } catch {
-          item.status = 'uploaded'
+          addResource({
+            name: file.name,
+            type: file.type || 'unknown',
+            size: file.size,
+            status: 'uploaded',
+          })
         }
       } else {
         // 模拟可读化处理
-        item.status = 'processing'
-        setResources((prev) => [item, ...prev])
+        const id = addResource({
+          name: file.name,
+          type: file.type || 'unknown',
+          size: file.size,
+          status: 'processing',
+        })
         setTimeout(() => {
-          setResources((prev) =>
-            prev.map((r) =>
-              r.id === id
-                ? {
-                    ...r,
-                    status: 'readable',
-                    content: `[可读化处理完成] 文件名：${file.name}\n类型：${file.type}\n大小：${formatSize(file.size)}\n\n（演示模式：实际产品中，PDF/图片会通过 OCR 提取文本，视频会通过 ASR 转写）`,
-                  }
-                : r,
-            ),
-          )
+          updateResource(id, {
+            status: 'readable',
+            content: `[可读化处理完成] 文件名：${file.name}\n类型：${file.type}\n大小：${formatSize(file.size)}\n\n（演示模式：实际产品中，PDF/图片会通过 OCR 提取文本，视频会通过 ASR 转写）`,
+          })
         }, 1500)
-        continue
       }
-
-      setResources((prev) => [item, ...prev])
     }
     addStudyTime(0)
   }
@@ -74,10 +58,6 @@ export default function ResourcesPage() {
     e.preventDefault()
     setDragging(false)
     handleFiles(e.dataTransfer.files)
-  }
-
-  const handleDelete = (id: string) => {
-    setResources((prev) => prev.filter((r) => r.id !== id))
   }
 
   return (
@@ -134,7 +114,7 @@ export default function ResourcesPage() {
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          {resources.map((r) => (
+          {resources.map((r: ResourceItem) => (
             <div key={r.id} className="app-card" style={{ padding: '24px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
                 <div>
@@ -163,7 +143,7 @@ export default function ResourcesPage() {
                   <button
                     className="btn-ghost"
                     style={{ padding: '4px 12px', fontSize: '0.8rem' }}
-                    onClick={() => handleDelete(r.id)}
+                    onClick={() => deleteResource(r.id)}
                   >
                     删除
                   </button>

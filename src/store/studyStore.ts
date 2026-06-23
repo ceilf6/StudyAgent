@@ -33,10 +33,21 @@ export interface PracticeRecord {
   demo?: boolean
 }
 
+export interface ResourceItem {
+  id: string
+  name: string
+  type: string
+  size: number
+  content?: string
+  status: 'uploaded' | 'processing' | 'readable'
+  createdAt: number
+}
+
 interface StudyState {
   sessions: StudySession[]
   learned: LearnedNode[]
   practices: PracticeRecord[]
+  resources: ResourceItem[]
   totalStudyTime: number // 秒
 
   createSession: (topic: string) => string
@@ -48,6 +59,11 @@ interface StudyState {
   markLearned: (topic: string, status: LearnedNode['status']) => void
   addPractice: (record: Omit<PracticeRecord, 'id' | 'createdAt'>) => void
   addStudyTime: (seconds: number) => void
+
+  addResource: (resource: Omit<ResourceItem, 'id' | 'createdAt'>) => string
+  updateResource: (id: string, patch: Partial<ResourceItem>) => void
+  deleteResource: (id: string) => void
+
   getStats: () => {
     totalTopics: number
     mastered: number
@@ -63,6 +79,7 @@ export const useStudyStore = create<StudyState>()(
       sessions: [],
       learned: [],
       practices: [],
+      resources: [],
       totalStudyTime: 0,
 
       createSession: (topic) => {
@@ -130,6 +147,22 @@ export const useStudyStore = create<StudyState>()(
 
       addStudyTime: (seconds) =>
         set((s) => ({ totalStudyTime: s.totalStudyTime + seconds })),
+
+      addResource: (resource) => {
+        const id = `r_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
+        set((s) => ({
+          resources: [{ ...resource, id, createdAt: Date.now() }, ...s.resources],
+        }))
+        return id
+      },
+
+      updateResource: (id, patch) =>
+        set((s) => ({
+          resources: s.resources.map((r) => (r.id === id ? { ...r, ...patch } : r)),
+        })),
+
+      deleteResource: (id) =>
+        set((s) => ({ resources: s.resources.filter((r) => r.id !== id) })),
 
       getStats: () => {
         const { learned, practices } = get()
