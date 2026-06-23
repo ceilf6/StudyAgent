@@ -31,6 +31,7 @@ When documents conflict or expected behavior is unclear, ask the maintainer inst
 - **NEVER push code without an open Issue and a feature branch.** The Issue grounds the "why"; the branch isolates the "what".
 - **NEVER skip Repo Guard CR.** Even in autonomous mode, the PR MUST pass Repo Guard CR before merge.
 - **NEVER treat spec/plan docs as the finish line.** They are the entry ticket to the loop, not the exit.
+- **NEVER announce work as complete while Repo Guard CR is pending or has unresolved `CHANGES_REQUESTED` findings.** CI passing is necessary but not sufficient — Repo Guard CR is a separate gate that runs AFTER CI, and its review is the final code-quality barrier before merge.
 
 **The loop:**
 
@@ -40,9 +41,16 @@ When documents conflict or expected behavior is unclear, ask the maintainer inst
 4. **Implement the smallest reviewable change** with focused tests.
 5. **Local quality gate.** Run `npm run quality:local` before pushing when feasible.
 6. **Open a PR to `main`** with the PR template filled in, including the Impact Summary for critical skeleton changes. The PR description MUST link the Issue (e.g., `Closes #123`).
-7. **Wait for CI, Contract Guard, Repo Guard CR,** and maintainer review comments. Do not merge while any gate is failing or pending.
-8. **Address actionable review comments** with follow-up commits, then rerun the relevant gates.
+7. **Wait for CI, Contract Guard, AND Repo Guard CR to all complete.** Do not merge — and do not announce completion — while any gate is failing or pending. "Wait" means actively polling the PR review state (e.g., `gh pr view <PR> --json reviews --jq '.reviews[] | {author, state, body}'`), not assuming the gate passed just because CI is green. Repo Guard CR typically runs after CI and posts a review comment; you MUST read that comment before claiming done.
+8. **Address actionable review comments** — especially any `CHANGES_REQUESTED` state from Repo Guard — with follow-up commits, then push and rerun the relevant gates. The PR is not done until Repo Guard CR posts an approval (or the maintainer explicitly overrides). If a finding is unclear or seems wrong, leave the PR open and ask the maintainer; do not silently ignore it.
 9. **Maintainer decides merge readiness**; do not add comment-triggered auto-merge behavior.
+
+**Completion criteria (all MUST be true before claiming work is done):**
+- [ ] CI passes (lint + build + test + test:workflows).
+- [ ] Contract Guard passes.
+- [ ] Repo Guard CR has posted a review AND its state is NOT `CHANGES_REQUESTED`.
+- [ ] If Repo Guard CR posted `CHANGES_REQUESTED` earlier, a follow-up commit addressed every finding AND the re-review state is no longer `CHANGES_REQUESTED`.
+- [ ] No gate is in `pending` state.
 
 **Pre-flight checklist (must be true before step 4):**
 - [ ] An Issue exists and is referenced in the branch name or PR.

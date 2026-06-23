@@ -202,6 +202,14 @@ test('AGENTS.md enforces mandatory Harness Loop with hard prohibitions', () => {
   assert.ok(content.includes('git branch --show-current'), 'AGENTS.md missing branch verification step');
 });
 
+test('AGENTS.md enforces waiting for Repo Guard CR before claiming done', () => {
+  const content = readRootFile('AGENTS.md');
+  assert.ok(content.includes('NEVER announce work as complete while Repo Guard CR is pending'), 'AGENTS.md missing prohibition on announcing completion before Repo Guard CR');
+  assert.ok(content.includes('CHANGES_REQUESTED'), 'AGENTS.md missing CHANGES_REQUESTED handling rule');
+  assert.ok(content.includes('Completion criteria'), 'AGENTS.md missing Completion criteria section');
+  assert.ok(content.includes('gh pr view'), 'AGENTS.md missing active polling instruction for PR review state');
+});
+
 test('AGENTS.md links SDD to Harness Loop', () => {
   const content = readRootFile('AGENTS.md');
   assert.ok(content.includes('SDD ⟶ Harness Loop linkage'), 'AGENTS.md missing SDD to Harness Loop linkage clause');
