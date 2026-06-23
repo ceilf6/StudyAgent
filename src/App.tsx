@@ -13,6 +13,9 @@ import { useSettingsStore, resolveTheme } from './store/settingsStore'
  * - 订阅 store 中的 theme（含 'system'）
  * - 将解析后的 ResolvedTheme 写入 <html data-theme>
  * - 当 theme === 'system' 时，监听 prefers-color-scheme 变化实时跟随
+ *
+ * matchMedia 防护与 settingsStore.resolveSystemTheme() 保持一致：
+ * 不支持 matchMedia 的环境回退到 obsidian，不抛错。
  */
 function useThemeEffect() {
   const theme = useSettingsStore((s) => s.theme)
@@ -25,6 +28,7 @@ function useThemeEffect() {
     apply()
 
     if (theme !== 'system') return
+    if (typeof window === 'undefined' || !window.matchMedia) return
     const mql = window.matchMedia('(prefers-color-scheme: dark)')
     mql.addEventListener('change', apply)
     return () => mql.removeEventListener('change', apply)
