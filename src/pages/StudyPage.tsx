@@ -20,6 +20,7 @@ export default function StudyPage() {
   const [error, setError] = useState('')
   const abortRef = useRef<AbortController | null>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
+  const streamContentRef = useRef<string>('')
 
   const currentSession = currentSessionId
     ? sessions.find((s) => s.id === currentSessionId)
@@ -63,6 +64,7 @@ export default function StudyPage() {
       setInput('')
       setStreaming(true)
       setStreamContent('')
+      streamContentRef.current = ''
 
       // 演示模式
       if (provider === 'demo') {
@@ -73,10 +75,12 @@ export default function StudyPage() {
         for (let i = 0; i < demoResp.length; i += 3) {
           acc += demoResp.slice(i, i + 3)
           setStreamContent(acc)
+          streamContentRef.current = acc
           await new Promise((r) => setTimeout(r, 12))
         }
         addMessage(sessionId, { role: 'assistant', content: demoResp, ts: Date.now() })
         setStreamContent('')
+        streamContentRef.current = ''
         setStreaming(false)
         markLearned(text.slice(0, 30), 'learning')
         return
@@ -85,29 +89,33 @@ export default function StudyPage() {
       // 真实 API 调用
       try {
         abortRef.current = new AbortController()
-        let fullText = ''
+        // 用局部变量保存流式累计文本，避免闭包读取过期的 state
+        let accText = ''
         await streamChat(
           history,
           { apiKey, baseURL, model },
           (chunk) => {
-            fullText += chunk
-            setStreamContent(fullText)
+            accText += chunk
+            setStreamContent(accText)
+            streamContentRef.current = accText
           },
           abortRef.current.signal,
         )
-        addMessage(sessionId, { role: 'assistant', content: fullText, ts: Date.now() })
+        addMessage(sessionId, { role: 'assistant', content: accText, ts: Date.now() })
         setStreamContent('')
+        streamContentRef.current = ''
         markLearned(text.slice(0, 30), 'learning')
       } catch (err) {
         if (err instanceof Error && err.name === 'AbortError') {
-          // 用户取消，保存已生成内容
-          if (streamContent) {
-            addMessage(sessionId, { role: 'assistant', content: streamContent, ts: Date.now() })
+          // 用户取消，从 ref 保存已生成内容（不依赖可能过期的 state）
+          if (streamContentRef.current) {
+            addMessage(sessionId, { role: 'assistant', content: streamContentRef.current, ts: Date.now() })
           }
         } else {
           setError(err instanceof Error ? err.message : 'AI 调用失败，请检查设置')
         }
         setStreamContent('')
+        streamContentRef.current = ''
       } finally {
         setStreaming(false)
         abortRef.current = null

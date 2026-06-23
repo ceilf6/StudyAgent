@@ -36,6 +36,27 @@ function countdown(n) {
 2. 写出递归关系
 3. 调用 \`sum(5)\` 应该返回 15`
 
+/**
+ * 从批改回复中解析得分
+ * 支持格式："3/3"、"2/3 正确"、"得分：2"、"2 分" 等
+ * 解析失败时返回 0
+ */
+function parseScore(text: string, total: number): number {
+  // 尝试匹配 "X/total" 格式
+  const slashMatch = text.match(/(\d+)\s*\/\s*3/)
+  if (slashMatch) {
+    const score = parseInt(slashMatch[1], 10)
+    if (score >= 0 && score <= total) return score
+  }
+  // 尝试匹配 "X 分" 或 "得分：X" 格式
+  const scoreMatch = text.match(/(?:得分|分数|评分)[：:]\s*(\d+)/)
+  if (scoreMatch) {
+    const score = parseInt(scoreMatch[1], 10)
+    if (score >= 0 && score <= total) return score
+  }
+  return 0
+}
+
 export default function PracticePage() {
   const { provider, apiKey, baseURL, model } = useSettingsStore()
   const { addPractice, practices } = useStudyStore()
@@ -142,7 +163,7 @@ function sum(n) {
         setAnswers(acc)
         await new Promise((r) => setTimeout(r, 10))
       }
-      addPractice({ topic, total: 3, correct: 2 })
+      // 演示模式不写入练习记录，避免假分数污染统计数据
       setChecking(false)
       return
     }
@@ -168,7 +189,7 @@ function sum(n) {
         },
         abortRef.current.signal,
       )
-      addPractice({ topic, total: 3, correct: 2 })
+      addPractice({ topic, total: 3, correct: parseScore(fullText, 3) })
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') {
         // 用户主动取消批改，保留已生成内容
