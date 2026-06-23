@@ -61,16 +61,21 @@ export default function PlansPage() {
     setError('')
     setLoading(true)
     setPlan('')
+    // demo 模式也接入 AbortController
+    abortRef.current = new AbortController()
+    const signal = abortRef.current.signal
 
     // 演示模式
     if (provider === 'demo') {
       let acc = ''
       for (let i = 0; i < DEMO_PLAN.length; i += 5) {
+        if (signal.aborted) break
         acc += DEMO_PLAN.slice(i, i + 5)
         setPlan(acc)
         await new Promise((r) => setTimeout(r, 10))
       }
       setLoading(false)
+      abortRef.current = null
       return
     }
 

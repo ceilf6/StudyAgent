@@ -38,26 +38,29 @@ function countdown(n) {
 
 /**
  * 从批改回复中解析得分
- * 支持格式："3/3"、"2/3"、"得分：2"、"分数：2"、"评分：2"、"总分：2"、"2 分" 等
+ * 只匹配明确的最终总分字段，避免误匹配正文中的"第 1 题…1 分"等
+ * 支持格式："总分：2"、"最终得分：2"、"最终评分：2/3"、"得分：2/3"
  * 解析失败时返回 -1（调用方据此决定是否写入记录）
  */
 function parseScore(text: string, total: number): number {
-  // 尝试匹配 "X/total" 格式（total 作为参数传入）
-  const slashMatch = text.match(new RegExp(`(\\d+)\\s*\\/\\s*${total}`))
+  // 只匹配明确的"总分|最终得分|最终评分"前缀，避免误匹配正文数字
+  const totalMatch = text.match(/(?:总分|最终得分|最终评分|最终分数)[：:]\s*(\d+)/)
+  if (totalMatch) {
+    const score = parseInt(totalMatch[1], 10)
+    if (score >= 0 && score <= total) return score
+  }
+  // 尝试匹配 "X/total" 格式（只取最后一行附近的匹配，避免正文中的分数）
+  const lines = text.split('\n')
+  const lastLines = lines.slice(-5).join('\n')
+  const slashMatch = lastLines.match(new RegExp(`(\\d+)\\s*\\/\\s*${total}`))
   if (slashMatch) {
     const score = parseInt(slashMatch[1], 10)
     if (score >= 0 && score <= total) return score
   }
-  // 尝试匹配 "得分|分数|评分|总分：X" 格式
-  const scoreMatch = text.match(/(?:得分|分数|评分|总分)[：:]\s*(\d+)/)
+  // 尝试匹配最后一行的 "得分：X" 格式
+  const scoreMatch = lastLines.match(/(?:得分|分数|评分)[：:]\s*(\d+)/)
   if (scoreMatch) {
     const score = parseInt(scoreMatch[1], 10)
-    if (score >= 0 && score <= total) return score
-  }
-  // 尝试匹配 "X 分" 格式
-  const pointMatch = text.match(/(\d+)\s*分/)
-  if (pointMatch) {
-    const score = parseInt(pointMatch[1], 10)
     if (score >= 0 && score <= total) return score
   }
   return -1
@@ -83,15 +86,20 @@ export default function PracticePage() {
     setQuestions('')
     setAnswers('')
     setUserAnswer('')
+    // demo 模式也接入 AbortController
+    abortRef.current = new AbortController()
+    const signal = abortRef.current.signal
 
     if (provider === 'demo') {
       let acc = ''
       for (let i = 0; i < DEMO_QUESTIONS.length; i += 5) {
+        if (signal.aborted) break
         acc += DEMO_QUESTIONS.slice(i, i + 5)
         setQuestions(acc)
         await new Promise((r) => setTimeout(r, 10))
       }
       setLoading(false)
+      abortRef.current = null
       return
     }
 
@@ -163,14 +171,19 @@ function sum(n) {
 
 ---
 **评分参考**：第 1 题答对计 1 分，第 2 题答对执行过程计 1 分，第 3 题写出正确函数计 1 分。满分 3 分。`
+      // demo 批改也接入取消信号
+      abortRef.current = new AbortController()
+      const checkSignal = abortRef.current.signal
       let acc = ''
       for (let i = 0; i < demoFeedback.length; i += 5) {
+        if (checkSignal.aborted) break
         acc += demoFeedback.slice(i, i + 5)
         setAnswers(acc)
         await new Promise((r) => setTimeout(r, 10))
       }
       // 演示模式不写入练习记录，避免假分数污染统计数据
       setChecking(false)
+      abortRef.current = null
       return
     }
 

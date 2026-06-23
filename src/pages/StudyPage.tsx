@@ -65,24 +65,36 @@ export default function StudyPage() {
       setStreaming(true)
       setStreamContent('')
       streamContentRef.current = ''
+      // demo 模式也接入 AbortController，让"停止"真正可取消
+      abortRef.current = new AbortController()
+      const signal = abortRef.current.signal
 
       // 演示模式
       if (provider === 'demo') {
         const demoResp = getDemoResponse(text)
-        if (!demoResp) return
-        // 模拟流式输出
+        if (!demoResp) {
+          setStreaming(false)
+          return
+        }
+        // 模拟流式输出，每步检查取消信号
         let acc = ''
         for (let i = 0; i < demoResp.length; i += 3) {
+          if (signal.aborted) break
           acc += demoResp.slice(i, i + 3)
           setStreamContent(acc)
           streamContentRef.current = acc
           await new Promise((r) => setTimeout(r, 12))
         }
-        addMessage(sessionId, { role: 'assistant', content: demoResp, ts: Date.now() })
+        // 如果被取消，保留已生成内容；否则保存完整内容
+        const finalContent = signal.aborted ? acc : demoResp
+        if (finalContent) {
+          addMessage(sessionId, { role: 'assistant', content: finalContent, ts: Date.now() })
+        }
         setStreamContent('')
         streamContentRef.current = ''
         setStreaming(false)
-        markLearned(text.slice(0, 30), 'learning')
+        if (!signal.aborted) markLearned(text.slice(0, 30), 'learning')
+        abortRef.current = null
         return
       }
 
