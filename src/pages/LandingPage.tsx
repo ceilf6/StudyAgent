@@ -59,16 +59,6 @@ export default function LandingPage() {
     }
   }, [])
 
-  // 让 Hero 的"开始学习"按钮跳转到学习页
-  useEffect(() => {
-    const btn = document.querySelector('.btn-primary')
-    if (btn) {
-      const handler = () => navigate('/study')
-      btn.addEventListener('click', handler)
-      return () => btn.removeEventListener('click', handler)
-    }
-  }, [navigate])
-
   return (
     <>
       <div
@@ -98,7 +88,7 @@ export default function LandingPage() {
 
       <div className="container">
         <Nav />
-        <Hero />
+        <Hero onStart={() => navigate('/study')} />
         <Stats />
         <Features />
         <Workflow />

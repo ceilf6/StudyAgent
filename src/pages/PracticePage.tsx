@@ -179,7 +179,8 @@ function sum(n) {
 \`sum(5) = 5 + sum(4) = 5 + 4 + sum(3) = ... = 5+4+3+2+1+0 = 15\` ✓
 
 ---
-**评分参考**：第 1 题答对计 1 分，第 2 题答对执行过程计 1 分，第 3 题写出正确函数计 1 分。满分 3 分。`
+**评分参考**：第 1 题答对计 1 分，第 2 题答对执行过程计 1 分，第 3 题写出正确函数计 1 分。满分 3 分。
+**总分：2/3**（示例评分，实际得分由 AI 根据你的作答判定）`
       try {
         let acc = ''
         for (let i = 0; i < demoFeedback.length; i += 5) {
@@ -188,9 +189,10 @@ function sum(n) {
           setAnswers(acc)
           await new Promise((r) => setTimeout(r, 10))
         }
-        // demo 模式也写入一条带 [示例] 标记的练习记录，让历史面板在默认体验下可见
+        // demo 模式也写入一条带 [示例] 标记的练习记录，分数从示例文本中解析，保持与展示内容一致
         if (!signal.aborted) {
-          addPractice({ topic: `[示例] ${topic}`, total: 3, correct: 2 })
+          const demoScore = parseScore(demoFeedback, 3)
+          addPractice({ topic: `[示例] ${topic}`, total: 3, correct: demoScore >= 0 ? demoScore : 2 })
         }
       } finally {
         if (abortRef.current === myController) abortRef.current = null
