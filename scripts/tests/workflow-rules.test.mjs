@@ -253,6 +253,17 @@ test('mirror docs do not require reviewDecision APPROVED as sole completion crit
   assert.ok(workflow.includes('Do NOT rely on `reviewDecision` alone'), 'docs/workflow.md must warn against relying on reviewDecision alone');
 });
 
+test('AGENTS.md pre-flight checklist does not depend on PR existing before step 4', () => {
+  const content = readRootFile('AGENTS.md');
+  const checklistMatch = content.match(/Pre-flight checklist \(must be true before step 4\):([\s\S]*?)(?=\n\n|\n##)/);
+  assert.ok(checklistMatch, 'AGENTS.md must have a Pre-flight checklist before step 4');
+  const checklist = checklistMatch[1];
+  // The PR is created at step 6, so the pre-flight checklist must not require
+  // the PR to already exist. It should accept a planned reference or branch name.
+  assert.ok(checklist.includes('planned PR body'), 'Pre-flight checklist must accept a planned PR body reference, not require the PR to exist');
+  assert.ok(checklist.includes('PR itself is not created until step 6'), 'Pre-flight checklist must explicitly acknowledge the PR is not created until step 6');
+});
+
 test('AGENTS.md links SDD to Harness Loop', () => {
   const content = readRootFile('AGENTS.md');
   assert.ok(content.includes('SDD ⟶ Harness Loop linkage'), 'AGENTS.md missing SDD to Harness Loop linkage clause');

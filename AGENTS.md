@@ -53,7 +53,7 @@ When documents conflict or expected behavior is unclear, ask the maintainer inst
 - [ ] No gate is in `pending` state.
 
 **Pre-flight checklist (must be true before step 4):**
-- [ ] An Issue exists and is referenced in the branch name or PR.
+- [ ] An Issue exists and is referenced in the branch name or planned PR body (the PR itself is not created until step 6, so the reference can be a planned `Closes #N` in the PR description draft or the branch name including the issue number).
 - [ ] Current branch is NOT `main` (verify with `git branch --show-current`).
 - [ ] `npm run quality:predev` passed.
 - [ ] If SDD applies: spec under `docs/superpowers/specs/` and plan under `docs/superpowers/plans/` exist.
