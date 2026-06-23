@@ -15,7 +15,7 @@ When documents conflict or expected behavior is unclear, ask the maintainer inst
 ## Work
 
 1. **Harness Loop is MANDATORY for non-trivial changes** — see the Harness Loop section below. Do not start coding before completing steps 1–3 of that loop (Issue → branch → predev gates).
-2. Run `npm run agent:bootstrap` and `npm run quality:predev` before code changes when feasible.
+2. **Pre-flight gates are MANDATORY for non-trivial changes**: run `npm run agent:bootstrap` and `npm run quality:predev` before editing any file. Trivial changes (e.g. typo-only docs, single-line config tweaks with no contract impact) MAY skip these gates, but MUST state the skip reason in the commit message. There is no "feasibility" escape hatch — if the change touches code, contract, or critical skeleton, the gates MUST run.
 3. Before editing critical skeleton paths, run `npm run contract:check` and report the blast radius.
 4. Keep changes focused and independently reviewable.
 5. Run focused tests for the touched area, then broader gates as risk increases.
@@ -48,8 +48,8 @@ When documents conflict or expected behavior is unclear, ask the maintainer inst
 **Completion criteria (all MUST be true before claiming work is done):**
 - [ ] CI passes (lint + build + test + test:workflows).
 - [ ] Contract Guard passes.
-- [ ] Repo Guard CR has posted a review AND its state is NOT `CHANGES_REQUESTED`.
-- [ ] If Repo Guard CR posted `CHANGES_REQUESTED` earlier, a follow-up commit addressed every finding AND the re-review state is no longer `CHANGES_REQUESTED`.
+- [ ] Repo Guard CR has posted a review AND its `reviewDecision` is `APPROVED`. Any other state (`CHANGES_REQUESTED`, `REVIEW_REQUIRED`, `PENDING`, `null`/empty) means the work is NOT done. The only acceptable alternative to `APPROVED` is an explicit maintainer override recorded as a PR comment.
+- [ ] If Repo Guard CR posted `CHANGES_REQUESTED` earlier, a follow-up commit addressed every finding AND the re-review `reviewDecision` is `APPROVED`.
 - [ ] No gate is in `pending` state.
 
 **Pre-flight checklist (must be true before step 4):**

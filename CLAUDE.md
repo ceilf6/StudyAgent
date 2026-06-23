@@ -14,7 +14,7 @@ When documents conflict or expected behavior is unclear, ask the maintainer inst
 
 ## Work
 
-1. Run `npm run agent:bootstrap` and `npm run quality:predev` before code changes when feasible.
+1. **Pre-flight gates are MANDATORY for non-trivial changes**: run `npm run agent:bootstrap` and `npm run quality:predev` before editing any file. Trivial changes (e.g. typo-only docs, single-line config tweaks with no contract impact) MAY skip these gates, but MUST state the skip reason in the commit message. There is no "feasibility" escape hatch — if the change touches code, contract, or critical skeleton, the gates MUST run.
 2. Before editing critical skeleton paths, run `npm run contract:check` and report the blast radius.
 3. Keep changes focused and independently reviewable.
 4. Run focused tests for the touched area, then broader gates as risk increases.

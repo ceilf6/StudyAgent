@@ -39,7 +39,7 @@ Maintainers should clarify scope, affected area, expected behavior, and verifica
 Agents working in this repository should:
 
 1. Read `CONTRIBUTING.md`, this file, and `docs/knowledge-contract.md` before larger edits.
-2. Run `npm run agent:bootstrap` and `npm run quality:predev` before code changes when feasible.
+2. **Pre-flight gates are MANDATORY for non-trivial changes**: run `npm run agent:bootstrap` and `npm run quality:predev` before editing any file. Trivial changes (e.g. typo-only docs) MAY skip these gates with a stated skip reason in the commit message. There is no "feasibility" escape hatch.
 3. Use impact analysis before modifying critical skeleton paths.
 4. Ask maintainers when docs conflict or the expected behavior is unclear.
 5. Keep changes scoped to the requested work and existing architecture.

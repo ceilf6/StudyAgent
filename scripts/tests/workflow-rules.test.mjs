@@ -211,6 +211,20 @@ test('AGENTS.md enforces waiting for Repo Guard CR before claiming done', () => 
   assert.ok(!content.includes('The Issue MUST reference the spec/plan'), 'AGENTS.md still has circular dependency between Issue and spec/plan');
 });
 
+test('AGENTS.md requires APPROVED reviewDecision, not just absence of CHANGES_REQUESTED', () => {
+  const content = readRootFile('AGENTS.md');
+  assert.ok(content.includes('`APPROVED`'), 'AGENTS.md missing APPROVED requirement in Completion criteria');
+  assert.ok(content.includes('REVIEW_REQUIRED'), 'AGENTS.md must explicitly reject REVIEW_REQUIRED as a done state');
+  assert.ok(content.includes('maintainer override'), 'AGENTS.md missing maintainer override as the only alternative to APPROVED');
+});
+
+test('AGENTS.md removes when-feasible escape hatch for pre-flight gates', () => {
+  const content = readRootFile('AGENTS.md');
+  assert.ok(content.includes('Pre-flight gates are MANDATORY'), 'AGENTS.md must mark pre-flight gates as MANDATORY');
+  assert.ok(content.includes('no "feasibility" escape hatch'), 'AGENTS.md must explicitly reject feasibility as an escape hatch');
+  assert.ok(!/before code changes when feasible/.test(content), 'AGENTS.md still contains the old "when feasible" escape hatch');
+});
+
 test('AGENTS.md links SDD to Harness Loop', () => {
   const content = readRootFile('AGENTS.md');
   assert.ok(content.includes('SDD ⟶ Harness Loop linkage'), 'AGENTS.md missing SDD to Harness Loop linkage clause');
