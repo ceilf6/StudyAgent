@@ -35,13 +35,13 @@ When documents conflict or expected behavior is unclear, ask the maintainer inst
 
 **The loop:**
 
-1. **Issue first.** Start from an Issue, Discussion, or maintainer-approved task description. If none exists, create one before writing any code. The Issue MUST reference the spec/plan if SDD applies.
+1. **Issue first.** Start from an Issue, Discussion, or maintainer-approved task description. If none exists, create one before writing any code. If SDD applies, the spec/plan created in step 3 MUST reference this Issue (not the other way around — the Issue exists first, the spec/plan references it after creation).
 2. **Branch from `main`.** Create a short-lived branch using `feat/`, `fix/`, `docs/`, or `chore/`. Confirm `git branch` shows the new branch BEFORE editing any file.
 3. **Pre-flight gates.** Run `npm run agent:bootstrap` and `npm run quality:predev`. Resolve any contract violations before proceeding.
 4. **Implement the smallest reviewable change** with focused tests.
 5. **Local quality gate.** Run `npm run quality:local` before pushing when feasible.
 6. **Open a PR to `main`** with the PR template filled in, including the Impact Summary for critical skeleton changes. The PR description MUST link the Issue (e.g., `Closes #123`).
-7. **Wait for CI, Contract Guard, AND Repo Guard CR to all complete.** Do not merge — and do not announce completion — while any gate is failing or pending. "Wait" means actively polling the PR review state (e.g., `gh pr view <PR> --json reviews --jq '.reviews[] | {author, state, body}'`), not assuming the gate passed just because CI is green. Repo Guard CR typically runs after CI and posts a review comment; you MUST read that comment before claiming done.
+7. **Wait for CI, Contract Guard, AND Repo Guard CR to all complete.** Do not merge — and do not announce completion — while any gate is failing or pending. "Wait" means actively polling the PR's current review decision (e.g., `gh pr view <PR> --json reviewDecision --jq '.reviewDecision'`), not assuming the gate passed just because CI is green. The `reviewDecision` field reflects the consolidated latest state; do NOT rely on the raw `reviews[]` array alone, which contains historical events that may include stale `CHANGES_REQUESTED` records from earlier rounds. Repo Guard CR typically runs after CI and posts a review; you MUST read that review's body before claiming done.
 8. **Address actionable review comments** — especially any `CHANGES_REQUESTED` state from Repo Guard — with follow-up commits, then push and rerun the relevant gates. The PR is not done until Repo Guard CR posts an approval (or the maintainer explicitly overrides). If a finding is unclear or seems wrong, leave the PR open and ask the maintainer; do not silently ignore it.
 9. **Maintainer decides merge readiness**; do not add comment-triggered auto-merge behavior.
 

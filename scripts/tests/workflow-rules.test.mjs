@@ -207,7 +207,8 @@ test('AGENTS.md enforces waiting for Repo Guard CR before claiming done', () => 
   assert.ok(content.includes('NEVER announce work as complete while Repo Guard CR is pending'), 'AGENTS.md missing prohibition on announcing completion before Repo Guard CR');
   assert.ok(content.includes('CHANGES_REQUESTED'), 'AGENTS.md missing CHANGES_REQUESTED handling rule');
   assert.ok(content.includes('Completion criteria'), 'AGENTS.md missing Completion criteria section');
-  assert.ok(content.includes('gh pr view'), 'AGENTS.md missing active polling instruction for PR review state');
+  assert.ok(content.includes('reviewDecision'), 'AGENTS.md missing reviewDecision-based polling instruction');
+  assert.ok(!content.includes('The Issue MUST reference the spec/plan'), 'AGENTS.md still has circular dependency between Issue and spec/plan');
 });
 
 test('AGENTS.md links SDD to Harness Loop', () => {
