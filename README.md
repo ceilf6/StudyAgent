@@ -86,3 +86,7 @@ npm run preview
 - [产品需求文档 (PRD)](.trae/documents/PRD.md)
 - [学习智能体提示词](docs/agent-prompts/)
 - [工程开发提示词](AGENTS.md)
+
+## 友情链接
+
+[LinuxDo](https://linux.do/)
